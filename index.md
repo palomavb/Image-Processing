@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head> <meta charset="UTF-8">
+	<title> Halloween </title>
+</head>
+
+<body>
+	<h1 align="center"> Trabalho 1 - Introdução à Computação Gráfica</h1>
+	
+<div align="justify">
+    <p> 
+        Para produzir a ilustração deste trabalho, trabalhei com o SVG inline aqui no HTMl mesmo. 
+		Usei algumas figuras geométricas do próprio SVG, como a elipse e o círculo, além de path, polygon e polyline.
+		Na construção do gato, usei a transformação rotate para rotacionar levemente a cabeça, orelhas e olhos.
+		E, para construir a lua, usei dois arcos, novamente a transformação rotate e diminui a opacidade da cor.
+		<br>
+		A animação dos elementos foi toda feita por CSS neste mesmo documento HTML.
+    </p>
+</div>
+	
+<div>
+	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1500px" height="1000px">
+	<!-- ghost -->
+	<path class="ghost" d="M 150 410 q 150 -600 300 0" stroke="black" stroke-width="4" fill="none" />
+	<polyline class="ghost" fill="none" stroke="black" stroke-width="4"
+        points="   150,410      165,390,      180,410      195,390      210,410      225,390      240,410      
+				   255,390      270,410       285,390       300,410      315,390      330,410      345,390      
+				   360,410      375,390       390,410      405,390       420,410      435,390      450,410" />
+	<ellipse class="ghosteye" cx="280" cy="200" rx="15" ry="20" fill="black" />
+	<ellipse class="ghosteye" cx="320" cy="200" rx="15" ry="20" fill="black" />
+	<ellipse class="ghosteye" cx="300" cy="250" rx="10" ry="18" fill="black" /> 
+	<ellipse class="sombra" cx="300" cy="600" rx="175" ry="30" fill="black" />
+
+	<!-- cat -->
+	<ellipse class="catbody" cx="800" cy="555" rx="45" ry="70" fill="black" />
+	<ellipse class="cathead" cx="810" cy="460" rx="50" ry="40" fill="black" transform="rotate(15,800,460)" />
+	<ellipse class="catfoot" cx="775" cy="620" rx="20" ry="10" fill="black" />
+	<ellipse class="catfoot" cx="825" cy="620" rx="20" ry="10" fill="black" />
+	<polygon class="catear" points="800,430 810,390 820,430" fill="black" transform="rotate(15,810,420)" />
+	<polygon class="catear" points="840,450 850,410 860,450" fill="black" transform="rotate(15,850,430)" />
+	<circle class="cateye" cx="790" cy="450" r="9" fill="yellow"/>
+	<circle class="cateye" cx="820" cy="460" r="9" fill="yellow"/>
+	<ellipse class="cateye" cx="790" cy="450" rx="2" ry="7" fill="black" transform="rotate(20,790,450)" />
+	<ellipse class="cateye" cx="820" cy="460" rx="2" ry="7" fill="black" transform="rotate(20,820,460)" />
+	<path class="catrabo" d="M 830 600 C 830 580, 860 580, 860 600 S 900 620, 900 600 " stroke="black" stroke-width="5" fill="none"/>
+	
+	<!-- moon -->
+	<path d="M700 30 A60 60 0 1 0 700 130 50 50 0 1 1 700 30 z" stroke="none" fill="rgba(105, 105, 105, 0.5)" transform="rotate(-50,700,50)" />
+	
+	<style>
+	.ghost {
+        animation-name: ghostMoves;
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+        transform-origin: 50% 50%;
+    }
+    @keyframes ghostMoves {
+        0%   { transform: translate(0, 0); }
+        25%  { transform: translate(0, -100px); }
+        75%  { transform: translate(0, 120px); }
+        100%  { transform: translate(0, 0); }
+    }
+	.ghosteye {
+        animation-name: ghosteyeMoves;
+        animation-duration: 10s;
+        animation-iteration-count: infinite;
+        transform-origin: 50% 50%;
+    }
+    @keyframes ghosteyeMoves {
+        0%   { transform: translate(0, 0); }
+        25%  { transform: translate(-30px, -100px); }
+        75%  { transform: translate(30px, 120px); }
+        100%  { transform: translate(0, 0); }
+    }
+	.cateye {
+            animation-name: cateyeOpacity;
+            animation-duration: 8s;
+            animation-iteration-count: infinite;
+        }
+        @keyframes cateyeOpacity {
+            0%   { opacity: 1; }
+            5%  { opacity: 0; }
+            100% { opacity: 1; }
+        }
+	</style>
+	</svg>
+</div>
+</body>
+
+</html>
