@@ -1,91 +1,165 @@
 <!DOCTYPE html>
 <html>
-
-<head> <meta charset="UTF-8">
-	<title> Halloween </title>
+<head>
+	<meta charset="UTF-8"/>
+	<link href="style.css" rel="stylesheet"/>
+	<title> Processamento de imagens em Canvas</title>
+	<!comment: MathJax para equações matemáticas em TeX>
+	<script type="text/javascript" async
+		src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML" async>
+	</script>
 </head>
-
 <body>
-	<h1 align="center"> Trabalho 1 - Introdução à Computação Gráfica</h1>
+	<h1>Leitura e processamento de imagens utilizando Canvas</h1>
+	<h2>Manipulação de histogramas em imagens</h2>
 	
-<div align="justify">
-    <p> 
-        Para produzir a ilustração deste trabalho, trabalhei com o SVG inline aqui no HTMl mesmo. 
-		Usei algumas figuras geométricas do próprio SVG, como a elipse e o círculo, além de path, polygon e polyline.
-		Na construção do gato, usei a transformação rotate para rotacionar levemente a cabeça, orelhas e olhos.
-		E, para construir a lua, usei dois arcos, novamente a transformação rotate e diminui a opacidade da cor.
-		<br>
-		A animação dos elementos foi toda feita por CSS neste mesmo documento HTML.
-    </p>
-</div>
-	
-<div>
-	<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="1500px" height="1000px">
-	<!-- ghost -->
-	<path class="ghost" d="M 150 410 q 150 -600 300 0" stroke="black" stroke-width="4" fill="none" />
-	<polyline class="ghost" fill="none" stroke="black" stroke-width="4"
-        points="   150,410      165,390,      180,410      195,390      210,410      225,390      240,410      
-				   255,390      270,410       285,390       300,410      315,390      330,410      345,390      
-				   360,410      375,390       390,410      405,390       420,410      435,390      450,410" />
-	<ellipse class="ghosteye" cx="280" cy="200" rx="15" ry="20" fill="black" />
-	<ellipse class="ghosteye" cx="320" cy="200" rx="15" ry="20" fill="black" />
-	<ellipse class="ghosteye" cx="300" cy="250" rx="10" ry="18" fill="black" /> 
-	<ellipse class="sombra" cx="300" cy="600" rx="175" ry="30" fill="black" />
+	<h2>Histograma de RGB</h2>
+	<p>A imagem original a ser trabalhada foi retirada do site Unsplash. Ao lado temos o histograma da distribuição RGB da imagem.</p>
+<figure>
+	<canvas id="imagemOriginal" width="400" height="580"></canvas>
+	<canvas id="rgbhistogram" width="400" height="580"></canvas>
+</figure>
 
-	<!-- cat -->
-	<ellipse class="catbody" cx="800" cy="555" rx="45" ry="70" fill="black" />
-	<ellipse class="cathead" cx="810" cy="460" rx="50" ry="40" fill="black" transform="rotate(15,800,460)" />
-	<ellipse class="catfoot" cx="775" cy="620" rx="20" ry="10" fill="black" />
-	<ellipse class="catfoot" cx="825" cy="620" rx="20" ry="10" fill="black" />
-	<polygon class="catear" points="800,430 810,390 820,430" fill="black" transform="rotate(15,810,420)" />
-	<polygon class="catear" points="840,450 850,410 860,450" fill="black" transform="rotate(15,850,430)" />
-	<circle class="cateye" cx="790" cy="450" r="9" fill="yellow"/>
-	<circle class="cateye" cx="820" cy="460" r="9" fill="yellow"/>
-	<ellipse class="cateye" cx="790" cy="450" rx="2" ry="7" fill="black" transform="rotate(20,790,450)" />
-	<ellipse class="cateye" cx="820" cy="460" rx="2" ry="7" fill="black" transform="rotate(20,820,460)" />
-	<path class="catrabo" d="M 830 600 C 830 580, 860 580, 860 600 S 900 620, 900 600 " stroke="black" stroke-width="5" fill="none"/>
+	<h2>Histograma de Luminância</h2>
+	<p>Realizando a conversão de RGB para HSL, é possível gerar o histograma de luminância da imagem.</p>
 	
-	<!-- moon -->
-	<path d="M700 30 A60 60 0 1 0 700 130 50 50 0 1 1 700 30 z" stroke="none" fill="rgba(105, 105, 105, 0.5)" transform="rotate(-50,700,50)" />
+<figure>
+	<canvas id="lumhistogram" width="400" height="580"></canvas>
+</figure>
+
+	<h2>Modificação de Luminância</h2>
+	<p>Ao alterar a distribuição de frequência de cores muito claras e cores muito escuras, através do canal de luminância, aumentamos o contraste da imagem. Nesse caso, alterei em 30%.</p>
 	
-	<style>
-	.ghost {
-        animation-name: ghostMoves;
-        animation-duration: 10s;
-        animation-iteration-count: infinite;
-        transform-origin: 50% 50%;
+<figure>
+	<canvas id="imagemOutput" width="400" height="580"></canvas>
+</figure>
+
+<script>
+	var canvasOriginal = document.getElementById("imagemOriginal");
+	var ctxOriginal = canvasOriginal.getContext("2d");
+	
+	var canvasHist = document.getElementById("rgbhistogram");
+	var ctxHist = canvasHist.getContext("2d");
+	
+	var canvasLumHist = document.getElementById("lumhistogram");
+	var ctxLumHist = canvasLumHist.getContext("2d");
+	
+	var canvasOut = document.getElementById("imagemOutput");
+	var ctxOutput = canvasOut.getContext("2d");
+	
+	var imgOriginal = new Image();
+	var imgHist = new Image();
+	var imgLumHist = new Image();
+	
+	//image link
+	var imgUrl = "https://images.unsplash.com/photo-1627245126222-60185a8b671f?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80";
+   
+	imgOriginal.crossOrigin = '';
+    imgOriginal.src = imgUrl;
+	imgOriginal.onload = function(){
+	ctxOriginal.drawImage(imgOriginal, 0, 0);
+	ctxHist.drawImage(imgHist, 0, 0);
+	ctxLumHist.drawImage(imgOriginal, 0, 0);
+	
+	imgHist = ctxOriginal.getImageData(0, 0, 400, 580);		
+	
+	//RGB arrays and histogram
+	function Histograma(x,y, color) {
+	ctxHist.beginPath();
+	ctxHist.moveTo(x, 580);
+	ctxHist.lineTo(x, 580-y);
+	ctxHist.strokeStyle = color;
+	ctxHist.stroke();
+	}
+
+	const r = [];
+	const g = [];
+	const b = [];	
+
+	for (let i = 0; i < imgHist.data.length; i += 4) {
+	
+		if ( isNaN(r[imgHist.data[i]]) )
+		{ r[imgHist.data[i]] = 0};
+		
+		r[imgHist.data[i]] += 1;
+		
+		if ( isNaN(g[imgHist.data[i+1]]) )
+		{ g[imgHist.data[i+1]] = 0};
+		
+		g[imgHist.data[i+1]] += 1;
+		
+		if ( isNaN(b[imgHist.data[i+2]]) )
+		{ b[imgHist.data[i+2]] = 0};
+		
+		b[imgHist.data[i+2]] += 1;
+	}	
+	
+	for(var i=0; i <= r.length; i++){
+		Histograma(i,r[i]/10,'red');
+	}	
+	for(var i=0; i <= g.length; i++){
+		Histograma([i],g[i]/10,'green');
+	}
+	for(var i=0; i <= b.length; i++){
+		Histograma([i],b[i]/10, 'blue');
+	}
+	
+	//rgb to hsl
+	const h = [];
+	const s = [];
+	const l = [];
+	
+	for (var i = 0; i <= r.length; i++) {
+		var max = Math.max(r[i], g[i], b[i]), min = Math.min(r[i], g[i], b[i]);
+		h[i], s[i], l[i] = (max + min) / 2;
+
+		if(max == min){
+			h[i] = s[i] = 0; 
+		}else{
+			var d = max - min;
+			s[i] = l[i] > 0.5 ? d / (2 - max - min) : d / (max + min);}
+        switch(max){ 
+            case r: h = (g[i] - b[i]) / d + (g[i] < b[i] ? 6 : 0); break;
+            case g: h = (b[i] - r[i]) / d + 2; break; 
+            case b: h = (r[i] - g[i]) / d + 4; break; 
+        } 
+        h[i] /= 6; 
     }
-    @keyframes ghostMoves {
-        0%   { transform: translate(0, 0); }
-        25%  { transform: translate(0, -100px); }
-        75%  { transform: translate(0, 120px); }
-        100%  { transform: translate(0, 0); }
-    }
-	.ghosteye {
-        animation-name: ghosteyeMoves;
-        animation-duration: 10s;
-        animation-iteration-count: infinite;
-        transform-origin: 50% 50%;
-    }
-    @keyframes ghosteyeMoves {
-        0%   { transform: translate(0, 0); }
-        25%  { transform: translate(-30px, -100px); }
-        75%  { transform: translate(30px, 120px); }
-        100%  { transform: translate(0, 0); }
-    }
-	.cateye {
-            animation-name: cateyeOpacity;
-            animation-duration: 8s;
-            animation-iteration-count: infinite;
-        }
-        @keyframes cateyeOpacity {
-            0%   { opacity: 1; }
-            5%  { opacity: 0; }
-            100% { opacity: 1; }
-        }
-	</style>
-	</svg>
-</div>
+	
+	//luminance histogram
+	function Lum(x,y, color) {
+	ctxLumHist.beginPath();
+	ctxLumHist.moveTo(x, 580);
+	ctxLumHist.lineTo(x, 580-y);
+	ctxLumHist.strokeStyle = color;
+    ctxLumHist.stroke();
+	}
+	
+	for(var i=0; i <= l.length; i++){
+	Lum([i],l[i]/10, 'darkgray');
+	}
+	
+	//changing frequency distribution
+	for (let i = 0; i < imgHist.data.length; i += 4) {	
+		if ( imgHist.data[i] < 120 )
+		{imgHist.data[i] = imgHist.data[i] - imgHist.data[i]*0.3 };
+		
+		imgHist.data[i] = imgHist.data[i] + imgHist.data[i]*0.3;
+		
+		if ( imgHist.data[i+1] < 120 )
+		{imgHist.data[i+1] = imgHist.data[i+1] - imgHist.data[i+1]*0.3 };
+		
+		imgHist.data[i+1] = imgHist.data[i+1] + imgHist.data[i+1]*0.3;
+		
+		if ( imgHist.data[i+2] < 120 )
+		{imgHist.data[i+2] = imgHist.data[i+2] - imgHist.data[i+2]*0.3 };
+		
+		imgHist.data[i+2] = imgHist.data[i+2] + imgHist.data[i+2]*0.3;
+	}	
+	ctxOutput.putImageData(imgHist, 0, 0);
+	
+}
+</script>
+
 </body>
-
 </html>
